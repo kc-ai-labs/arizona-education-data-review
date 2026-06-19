@@ -33,6 +33,19 @@
         
       </div>
 
+      <section class="summary-detail-card" aria-label="About this static review">
+        <details class="executive-interpret-details" open>
+          <summary><strong>About this static review</strong></summary>
+          <p class="subtle">This is a streamlined, public version of the full analysis tool, simplified to run as a web page (GitHub Pages) with no server or database behind it. A few things are intentionally narrower than the full tool:</p>
+          <ul class="subtle">
+            <li><strong>It focuses on the top 100 relationships</strong> (the strongest, "high-signal" ones), which are a sample of the larger set. Other relationships appear in the lists for reference but are not clickable here.</li>
+            <li><strong>Individual relationship charts show the full statewide picture.</strong> The county filter still narrows the lists and summary numbers, but the per-relationship charts are not recalculated by county. In the full tool that recalculation runs on the server, which a static page cannot do.</li>
+            <li>A couple of free-text search boxes and one advanced prediction panel are simplified, and the data is a point-in-time snapshot.</li>
+          </ul>
+          <p class="subtle">Everything else behaves the same as the full tool.</p>
+        </details>
+      </section>
+
       <div id="api-error" class="error-banner" hidden></div>
 
       <section class="definitions-controls executive-controls" aria-label="Executive summary filters">
