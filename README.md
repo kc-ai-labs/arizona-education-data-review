@@ -1,6 +1,6 @@
-# ASU Helios K-8 Outliers Review
+# Arizona Education Data Review
 
-A static, self-contained review of the K-8 outlier, validation, and prediction analysis built by KC AI Labs for the ASU Helios Decision Center. The full application runs entirely from pre-generated JSON files, with no database or server.
+A static, self-contained review of a K-8 outlier, validation, and prediction analysis over Arizona public school data. The full application runs entirely from pre-generated JSON files, with no database or server.
 
 ## Pages
 
@@ -8,7 +8,7 @@ A static, self-contained review of the K-8 outlier, validation, and prediction a
 - **Scatter Plot** — school comparison by selected metrics with a fitted regression line.
 - **Correlation Outliers** — predictor-to-outcome relationships, trend outliers, and Isolation Forest overlap.
 - **Data Cleaning** — exclusion rules and per-field impact.
-- **Validation** — Phase 2 coverage of internal fields validated against official sources.
+- **Validation** — coverage of internal fields validated against official sources.
 - **Assessment Predictions / Assessment Overview** — school and county trend forecasts.
 - **Summary Stats, Methodology, Field Definitions, Field Mapping** — descriptive statistics and the data dictionary.
 

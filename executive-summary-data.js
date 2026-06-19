@@ -108,7 +108,7 @@ window.EXEC_SUMMARY_DATA = {
     },
     {
       label: "Delivery integration",
-      artifact: "delivery/asu-reference-stack/scripts/load_phase1_outputs_to_mssql.py",
+      artifact: "delivery/reference-stack/scripts/load_phase1_outputs_to_mssql.py",
       note: "Bridges Databricks outputs into MSSQL analytics tables consumed by API and web pages."
     },
     {

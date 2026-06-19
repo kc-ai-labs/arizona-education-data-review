@@ -238,7 +238,7 @@ window.METHODOLOGY_DATA = {
       status: "partial",
       mappedRequirementIds: ["REQ-006"],
       questionAnswered: "How are methods and findings communicated for technical review and stakeholder interpretation?",
-      approachSummary: "The primary report is the Databricks narrative notebook (01_analysis.py) with markdown + charts, supported by a Plotly dashboard notebook (03_dashboard.py) for exploration and curated highlights. This reference stack web app provides a separate delivery scaffold for ASU-aligned interfaces.",
+      approachSummary: "The primary report is the Databricks narrative notebook (01_analysis.py) with markdown + charts, supported by a Plotly dashboard notebook (03_dashboard.py) for exploration and curated highlights. This reference stack web app provides a separate delivery scaffold for delivery-aligned interfaces.",
       keyVariables: [
         "Top 5 deep-dive correlations plus broader correlation index/context (per Phase 1 context decisions)",
         "Plain-language interpretation requirements for educational stakeholders",
