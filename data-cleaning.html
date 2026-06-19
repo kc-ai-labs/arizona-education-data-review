@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ASU K8 Outliers - Data Cleaning</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="top-nav">
+    <nav class="tabs" aria-label="Primary navigation">
+      <a href="./index.html">Executive Summary</a>
+      <a href="./scatter.html">Scatter Plot</a>
+      <a href="./correlation-outliers.html">Correlation Outliers</a>
+      <a href="./data-cleaning.html" class="active" aria-current="page">Data Cleaning</a>
+      <a href="./validation.html">Validation</a>
+      <a href="./assessment-predictions.html">Assessment Predictions</a>
+      <a href="./assessment-overview.html">Assessment Overview</a>
+      <a href="./summary-stats.html">Summary Stats</a>
+      <a href="./methodology.html">Methodology</a>
+      <a href="./definitions.html">Field Definitions</a>
+      <a href="./raw-data.html">Field Mapping</a>
+    </nav>
+  </header>
+
+  <main class="definitions-layout raw-data-layout">
+    <section class="chart-section definitions-panel raw-data-panel">
+      <div class="definitions-header raw-data-header">
+        <div>
+          <h1>Data Cleaning</h1>
+          <p class="subtle">Review missing/invalid exclusions, rule semantics, and pair-level impacts used by the scatter and correlation explorer pages.</p>
+        </div>
+        <img src="./assets/asu-helios-logo-primary.webp" alt="ASU Helios Logo" class="logo definitions-logo" />
+      </div>
+
+      <div id="api-error" class="error-banner" hidden></div>
+
+      <section class="summary-cards correlation-kpis" aria-label="Data cleaning summary">
+        <div class="summary-card"><span>Total Exclusions</span><strong id="dc-total-exclusions">0</strong></div>
+        <div class="summary-card"><span>Affected Schools</span><strong id="dc-affected-schools">0</strong></div>
+        <div class="summary-card"><span>Affected Fields</span><strong id="dc-affected-fields">0</strong></div>
+        <div class="summary-card"><span>Affected Pairs</span><strong id="dc-affected-pairs">0</strong></div>
+      </section>
+      <p id="dc-latest-run" class="subtle" style="margin-top:8px;">Latest cleaning run: -</p>
+
+      <section class="definitions-controls correlation-controls" aria-label="Data cleaning filters">
+        <div>
+          <label for="dc-county">Pair County</label>
+          <select id="dc-county"></select>
+        </div>
+        <div>
+          <label for="dc-search">Field Search</label>
+          <input id="dc-search" type="search" placeholder="Search field, label, or description..." />
+        </div>
+        <div class="badge-row">
+          <button id="dc-refresh" type="button" class="tab-btn active">Refresh</button>
+        </div>
+      </section>
+
+      <section class="filters-card methodology-card" aria-label="Field quality matrix">
+        <div class="pair-header-row">
+          <div>
+            <h2>Field Quality Matrix</h2>
+            <p class="subtle">Combined view of field-level rule context, profiling counts, and exclusion impact. Sorted by excluded schools first.</p>
+          </div>
+          <div class="chip-row">
+            <span id="dc-matrix-count" class="chip info-chip">Rows: 0</span>
+          </div>
+        </div>
+        <div class="table-wrap outlier-table-wrap">
+          <table class="definitions-table pair-list-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Type</th>
+                <th>Rule</th>
+                <th>Range</th>
+                <th>Sentinels</th>
+                <th>Null Tokens</th>
+                <th>Blank</th>
+                <th>Null Token</th>
+                <th>Parse</th>
+                <th>Invalid</th>
+                <th>Excl Schools</th>
+                <th>Excl %</th>
+                <th>Reason Mix (Schools)</th>
+                <th>Availability</th>
+              </tr>
+            </thead>
+            <tbody id="dc-field-matrix-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <details id="dc-pair-snapshot" class="filters-card methodology-card methodology-accordion-item" aria-label="Pair impact snapshot">
+        <summary class="methodology-accordion-summary">
+          <div class="methodology-accordion-title">
+            <div class="methodology-accordion-title-row">
+              <strong>Pair Impact Snapshot</strong>
+              <span id="dc-pair-count" class="subtle">Top 0 pairs</span>
+            </div>
+            <p class="methodology-accordion-subtitle">Compact view of the highest pair-level exclusion impacts.</p>
+          </div>
+        </summary>
+        <div class="methodology-accordion-body">
+          <p class="subtle" style="margin-bottom:10px;">
+            <a id="dc-full-pairs-link" href="./correlation-outliers.html">View full pair impacts</a>
+          </p>
+          <div class="table-wrap outlier-table-wrap">
+            <table class="definitions-table pair-list-table">
+              <thead>
+                <tr>
+                  <th>Pair</th>
+                  <th>Included</th>
+                  <th>Excluded</th>
+                  <th>Missing X/Y</th>
+                  <th>Invalid X/Y</th>
+                </tr>
+              </thead>
+              <tbody id="dc-pair-summary-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </details>
+
+      <section class="filters-card methodology-card" aria-label="Row-level exclusions">
+        <div class="pair-header-row">
+          <div>
+            <h2>Exclusion Details (Paged)</h2>
+            <p class="subtle">Raw values are preserved; cleaned values may be null when the exclusion rule nullifies the source value.</p>
+          </div>
+          <div class="chip-row">
+            <span id="dc-exclusion-count" class="chip info-chip">Rows: 0</span>
+          </div>
+        </div>
+
+        <section class="definitions-controls" style="margin-bottom:10px;">
+          <div>
+            <label for="dc-exclusion-school">School Lookup</label>
+            <input id="dc-exclusion-school" type="search" placeholder="School code or school name..." />
+          </div>
+          <div>
+            <label for="dc-exclusion-field">Field</label>
+            <input id="dc-exclusion-field" type="search" placeholder="e.g., ChronicAbsentPercent" />
+          </div>
+          <div>
+            <label for="dc-exclusion-reason">Reason</label>
+            <select id="dc-exclusion-reason">
+              <option value="">All</option>
+              <option value="blank_string">blank_string</option>
+              <option value="null_token">null_token</option>
+              <option value="parse_failure">parse_failure</option>
+              <option value="out_of_range">out_of_range</option>
+              <option value="sentinel_value">sentinel_value</option>
+            </select>
+          </div>
+          <div>
+            <label for="dc-exclusion-county">County</label>
+            <select id="dc-exclusion-county"></select>
+          </div>
+        </section>
+
+        <div class="table-wrap">
+          <table class="definitions-table pair-list-table">
+            <thead>
+              <tr>
+                <th>School</th>
+                <th>County</th>
+                <th>Field</th>
+                <th>Reason</th>
+                <th>Raw</th>
+                <th>Normalized</th>
+                <th>Stage</th>
+              </tr>
+            </thead>
+            <tbody id="dc-exclusions-body"></tbody>
+          </table>
+        </div>
+
+        <div class="filters-actions">
+          <button id="dc-prev-page" type="button" class="tab-btn">Previous</button>
+          <button id="dc-next-page" type="button" class="tab-btn">Next</button>
+          <span id="dc-page-label" class="subtle">Page 1</span>
+        </div>
+      </section>
+
+      <section class="filters-card methodology-card" aria-label="Methodology caveats">
+        <h2>Methodology & Caveats</h2>
+        <ul class="notes-list compact-notes">
+          <li>Raw staging values are preserved; cleaning nullifies invalid values in analysis-facing sources and records an exclusion reason.</li>
+          <li>Missing and invalid exclusions are tracked separately (for example blank/null-token vs out-of-range/sentinel).</li>
+          <li>Scatter and correlation OLS views exclude cleaned nulls; Isolation Forest should apply cleaning before imputation.</li>
+          <li>Rules are conservative and versioned for review. Fields without semantic rules are still profiled for future expansion.</li>
+        </ul>
+      </section>
+    </section>
+  </main>
+
+  <script src="./nav-guard.js?v=20260617a"></script>
+  <script src="./common-api.js?v=20260304a"></script>
+  <script src="./data-cleaning.js?v=20260304a"></script>
+</body>
+</html>

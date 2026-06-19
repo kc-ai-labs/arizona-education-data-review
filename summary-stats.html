@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ASU K8 Outliers - Summary Stats</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="top-nav">
+    <nav class="tabs" aria-label="Primary navigation">
+      <a href="./index.html">Executive Summary</a>
+      <a href="./scatter.html">Scatter Plot</a>
+      <a href="./correlation-outliers.html">Correlation Outliers</a>
+      <a href="./data-cleaning.html">Data Cleaning</a>
+      <a href="./validation.html">Validation</a>
+      <a href="./assessment-predictions.html">Assessment Predictions</a>
+      <a href="./assessment-overview.html">Assessment Overview</a>
+      <a href="./summary-stats.html" class="active" aria-current="page">Summary Stats</a>
+      <a href="./methodology.html">Methodology</a>
+      <a href="./definitions.html">Field Definitions</a>
+      <a href="./raw-data.html">Field Mapping</a>
+    </nav>
+  </header>
+
+  <main class="definitions-layout summary-stats-layout">
+    <section class="chart-section definitions-panel summary-stats-panel">
+      <div class="definitions-header summary-stats-header">
+        <div>
+          <h1>Summary Stats</h1>
+          <p class="subtle">Profile the merged final variable set in <code>analytics.vw_schools_master_analysis</code> with type-aware summary statistics and filterable field browsing.</p>
+        </div>
+        <img src="./assets/asu-helios-logo-primary.webp" alt="ASU Helios Logo" class="logo definitions-logo" />
+      </div>
+
+      <div id="api-error" class="error-banner" hidden></div>
+
+      <section class="summary-cards" aria-label="Dataset summary cards">
+        <div class="summary-card"><span>Rows In Scope</span><strong id="ss-rows">0</strong></div>
+        <div class="summary-card"><span>Total Fields</span><strong id="ss-fields">0</strong></div>
+        <div class="summary-card"><span>Measures</span><strong id="ss-measures">0</strong></div>
+        <div class="summary-card"><span>Dimension / Geo / IDs</span><strong id="ss-dimension-like">0</strong></div>
+        <div class="summary-card"><span>High Missing Fields</span><strong id="ss-high-missing">0</strong></div>
+        <div class="summary-card"><span>All-Null Fields</span><strong id="ss-all-null">0</strong></div>
+      </section>
+
+      <section class="definitions-controls summary-stats-controls" aria-label="Summary stats controls">
+        <div>
+          <label for="ss-search">Search Fields</label>
+          <input id="ss-search" type="search" placeholder="Search field, label, category, type, preview..." />
+        </div>
+        <div>
+          <label for="ss-type-filter">Variable Type</label>
+          <select id="ss-type-filter">
+            <option value="all">All</option>
+          </select>
+        </div>
+        <div>
+          <label for="ss-category-filter">Metadata Category</label>
+          <select id="ss-category-filter">
+            <option value="all">All</option>
+          </select>
+        </div>
+        <div>
+          <label for="ss-source-filter">Source Layer</label>
+          <select id="ss-source-filter">
+            <option value="all">All</option>
+            <option value="schools">schools</option>
+            <option value="school_range_included">school_range_included</option>
+          </select>
+        </div>
+        <div>
+          <label for="ss-county">County</label>
+          <select id="ss-county"><option value="all">All</option></select>
+        </div>
+        <div>
+          <label for="ss-school-type">School Type</label>
+          <select id="ss-school-type"><option value="all">All</option></select>
+        </div>
+        <div>
+          <label for="ss-title-one">Title I</label>
+          <select id="ss-title-one"><option value="all">All</option></select>
+        </div>
+        <div class="badge-row">
+          <div id="ss-field-count" class="badge">Showing 0 of 0 fields</div>
+        </div>
+      </section>
+
+      <section class="summary-stats-split" aria-label="Field browser and selected field detail">
+        <section class="summary-stats-browser filters-card">
+          <h2>Field Browser</h2>
+          <div class="table-wrap summary-stats-table-wrap">
+            <table class="definitions-table summary-stats-table">
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Label</th>
+                  <th>Type</th>
+                  <th>Source</th>
+                  <th>Category</th>
+                  <th>Missing %</th>
+                  <th>Distinct</th>
+                  <th>Numeric %</th>
+                  <th>Preview</th>
+                  <th>Flags</th>
+                </tr>
+              </thead>
+              <tbody id="ss-fields-body"></tbody>
+            </table>
+          </div>
+          <div id="ss-fields-empty" class="empty-state" hidden>No fields match current filters.</div>
+        </section>
+
+        <section class="summary-stats-detail filters-card">
+          <div class="summary-detail-heading">
+            <div>
+              <h2 id="ss-detail-title">Select a field</h2>
+              <p id="ss-detail-subtitle" class="subtle">Field-level summary statistics will appear here.</p>
+            </div>
+            <div id="ss-detail-type" class="badge summary-type-badge">-</div>
+          </div>
+
+          <div id="ss-detail-flags" class="flag-list" aria-label="Field quality flags"></div>
+
+          <section class="summary-detail-grid">
+            <section class="summary-detail-card">
+              <h3>Coverage</h3>
+              <dl id="ss-coverage-list" class="summary-list compact-summary"></dl>
+            </section>
+            <section class="summary-detail-card">
+              <h3>Statistics</h3>
+              <dl id="ss-stats-list" class="summary-list compact-summary"></dl>
+            </section>
+          </section>
+
+          <section class="summary-detail-card">
+            <h3 id="ss-chart-title">Distribution</h3>
+            <div class="chart-canvas-wrap summary-chart-wrap">
+              <canvas id="ss-detail-chart"></canvas>
+            </div>
+          </section>
+
+          <section class="summary-detail-card">
+            <h3>Warnings / Notes</h3>
+            <ul id="ss-warnings" class="notes-list"></ul>
+            <div id="ss-warnings-empty" class="empty-state" hidden>No warnings for this field.</div>
+          </section>
+
+          <section class="summary-detail-card">
+            <h3>Top Categories / Bins</h3>
+            <div class="table-wrap summary-mini-table-wrap">
+              <table class="definitions-table summary-mini-table">
+                <thead>
+                  <tr>
+                    <th id="ss-detail-table-col1">Value</th>
+                    <th id="ss-detail-table-col2">Count</th>
+                    <th id="ss-detail-table-col3">Pct</th>
+                  </tr>
+                </thead>
+                <tbody id="ss-detail-rows"></tbody>
+              </table>
+            </div>
+            <div id="ss-detail-rows-empty" class="empty-state" hidden>No chart rows available for this field.</div>
+          </section>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <script src="./nav-guard.js?v=20260617a"></script>
+  <script src="./common-api.js?v=20260223c"></script>
+  <script src="./summary-stats.js?v=20260223c"></script>
+</body>
+</html>

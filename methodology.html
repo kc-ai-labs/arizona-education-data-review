@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ASU K8 Outliers - Methodology</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="top-nav">
+    <nav class="tabs" aria-label="Primary navigation">
+      <a href="./index.html">Executive Summary</a>
+      <a href="./scatter.html">Scatter Plot</a>
+      <a href="./correlation-outliers.html">Correlation Outliers</a>
+      <a href="./data-cleaning.html">Data Cleaning</a>
+      <a href="./validation.html">Validation</a>
+      <a href="./assessment-predictions.html">Assessment Predictions</a>
+      <a href="./assessment-overview.html">Assessment Overview</a>
+      <a href="./summary-stats.html">Summary Stats</a>
+      <a href="./methodology.html" class="active" aria-current="page">Methodology</a>
+      <a href="./definitions.html">Field Definitions</a>
+      <a href="./raw-data.html">Field Mapping</a>
+    </nav>
+  </header>
+
+  <main class="definitions-layout methodology-layout">
+    <section class="chart-section definitions-panel methodology-panel">
+      <div class="definitions-header methodology-header">
+        <div>
+          <h1 id="methodology-title">Methodology</h1>
+          <p id="methodology-phase" class="subtle">Phase 1</p>
+          <p id="methodology-scope" class="subtle methodology-intro">
+            Phase 1 requirement status with generated evidence, artifact links, and current closure gaps.
+          </p>
+        </div>
+        <img src="./assets/asu-helios-logo-primary.webp" alt="ASU Helios Logo" class="logo definitions-logo" />
+      </div>
+
+      <div id="methodology-error" class="error-banner" hidden></div>
+      <section id="methodology-meta" class="methodology-meta-row" aria-label="Methodology metadata"></section>
+
+      <section class="summary-cards methodology-summary-grid" id="methodology-summary-cards" aria-label="Methodology status summary"></section>
+
+      <section class="summary-detail-card methodology-matrix-card" aria-labelledby="methodology-matrix-title">
+        <div class="methodology-card-heading">
+          <div>
+            <h2 id="methodology-matrix-title">Phase 1 Requirement Status Matrix</h2>
+            <p class="subtle">Simplified REQ-001 to REQ-007 status view with reasons, key evidence, and direct artifact links.</p>
+          </div>
+        </div>
+        <div class="table-wrap methodology-table-wrap">
+          <table class="definitions-table methodology-table">
+            <thead>
+              <tr>
+                <th>Req ID</th>
+                <th>Status</th>
+                <th>Requirement + Status Reason</th>
+                <th>Key Evidence</th>
+                <th>Artifact Links</th>
+              </tr>
+            </thead>
+            <tbody id="methodology-requirements-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="summary-detail-card methodology-accordion-card" aria-labelledby="methodology-details-title">
+        <h2 id="methodology-details-title">Requirement Details</h2>
+        <p class="subtle">Open a requirement to inspect evidence, links, required closure items, and short code samples.</p>
+        <div id="methodology-requirement-details" class="methodology-accordion-list"></div>
+      </section>
+
+      <section class="summary-detail-card methodology-open-items-card" aria-labelledby="methodology-required-title">
+        <h2 id="methodology-required-title">Required Gaps (Requirement Closure)</h2>
+        <p class="subtle">Only original requirement closure items are listed here.</p>
+        <div id="methodology-required-gaps"></div>
+      </section>
+
+      <section class="summary-detail-card methodology-open-items-card" aria-labelledby="methodology-backlog-title">
+        <details id="methodology-backlog-details" class="methodology-backlog-toggle">
+          <summary>
+            <h2 id="methodology-backlog-title">Backlog (Non-Requirement Items)</h2>
+          </summary>
+          <p class="subtle">Recommended improvements and optional extensions are separated from requirement status.</p>
+          <div id="methodology-backlog"></div>
+        </details>
+      </section>
+    </section>
+  </main>
+
+  <script src="./nav-guard.js?v=20260617a"></script>
+  <script src="./methodology-data.generated.js"></script>
+  <script src="./methodology.js"></script>
+</body>
+</html>

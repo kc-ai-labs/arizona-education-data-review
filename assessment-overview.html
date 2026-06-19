@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ASU K8 Outliers - Assessment Overview</title>
+  <link rel="stylesheet" href="./styles.css?v=20260617h" />
+</head>
+<body>
+  <header class="top-nav">
+    <nav class="tabs" aria-label="Primary navigation">
+      <a href="./index.html">Executive Summary</a>
+      <a href="./scatter.html">Scatter Plot</a>
+      <a href="./correlation-outliers.html">Correlation Outliers</a>
+      <a href="./data-cleaning.html">Data Cleaning</a>
+      <a href="./validation.html">Validation</a>
+      <a href="./assessment-predictions.html">Assessment Predictions</a>
+      <a href="./assessment-overview.html" class="active" aria-current="page">Assessment Overview</a>
+      <a href="./summary-stats.html">Summary Stats</a>
+      <a href="./methodology.html">Methodology</a>
+      <a href="./definitions.html">Field Definitions</a>
+      <a href="./raw-data.html">Field Mapping</a>
+    </nav>
+  </header>
+
+  <main class="definitions-layout assessment-layout">
+    <section class="chart-section definitions-panel assessment-panel assessment-overview-panel">
+      <div class="definitions-header assessment-header">
+        <div>
+          <h1>Assessment Overview</h1>
+          <p class="subtle">County-level and school-comparison view for Module 3 assessment trend indicators.</p>
+        </div>
+        <img src="./assets/asu-helios-logo-primary.webp" alt="ASU Helios Logo" class="logo definitions-logo" />
+      </div>
+
+      <div id="overview-api-error" class="error-banner" hidden></div>
+
+      <section class="definitions-controls assessment-overview-controls" aria-label="Assessment overview filters">
+        <div>
+          <label for="overview-county">County</label>
+          <select id="overview-county"><option value="All Counties">All Counties</option></select>
+        </div>
+        <div>
+          <label for="overview-subject">Subject</label>
+          <select id="overview-subject"><option value="Mathematics">Mathematics</option></select>
+        </div>
+        <div>
+          <label for="overview-test-level">Test Level</label>
+          <select id="overview-test-level"><option value="All Assessments">All Assessments</option></select>
+        </div>
+        <div>
+          <label for="overview-subgroup">Subgroup</label>
+          <select id="overview-subgroup"><option value="All Students">All Students</option></select>
+        </div>
+        <div>
+          <label for="overview-fay-status">FAY Status</label>
+          <select id="overview-fay-status"><option value="FAY">FAY</option></select>
+        </div>
+        <div class="badge-row">
+          <button id="overview-load" type="button" class="tab-btn active">Load</button>
+        </div>
+      </section>
+
+      <section class="assessment-school-multiselect" aria-label="Selected school comparison">
+        <div>
+          <label for="overview-school-search">Compare Schools</label>
+          <div class="assessment-school-search-row">
+            <input id="overview-school-search" type="search" list="overview-school-list" placeholder="Search school name or code" autocomplete="off" />
+            <datalist id="overview-school-list"></datalist>
+            <button id="overview-add-school" type="button" class="tab-btn">Add</button>
+          </div>
+        </div>
+        <div>
+          <span class="subtle">Selected schools</span>
+          <div id="overview-selected-schools" class="chip-row assessment-selected-schools"></div>
+        </div>
+      </section>
+
+      <p id="overview-filter-helper" class="assessment-filter-helper subtle">The current dataset only includes All Assessments, All Students, and FAY. Those controls stay visible for auditability.</p>
+
+      <label class="assessment-horizon-toggle" for="overview-show-fy2030">
+        <input id="overview-show-fy2030" type="checkbox" checked />
+        <span>Show FY2030 illustration</span>
+      </label>
+
+      <details id="overview-methods" class="assessment-methods" aria-label="How to read this page">
+        <summary>How to read this page (no statistics background needed)</summary>
+        <div class="assessment-methods-body">
+          <p><strong>Filters define the comparison group.</strong> County and subject change which schools appear in the aggregate cards, top movement lists, and school selector. Test level, subgroup, and FAY status stay visible for auditability; the current dataset has one value for each.</p>
+          <p><strong>Weighted aggregate.</strong> Picture pooling every tested student from the selected schools into one big group, then finding that whole group's passing rate. Schools that tested more students pull the average more, because they brought more students into the pool. The "Weights" chip shows how many schools have a recent tested-student count to pool in; schools missing that number sit out of this calculation.</p>
+          <p class="assessment-methods-example"><strong>Quick example.</strong> Two schools take the Math test: one at 48% passing with 111 students tested, and a larger school at 80% passing with 1,000 students tested. Give each school one equal vote and the average is (48 + 80) &divide; 2 = 64%. Weight by students tested and it is (48&times;111 + 80&times;1,000) &divide; (111 + 1,000) = 76.8%. The weighted number sits closer to 80% because that larger school tested about nine times as many students. <strong>Weighted = students vote; Median-School = schools vote.</strong></p>
+          <p><strong>Median school.</strong> This gives every school one vote and reports the middle school in the selected group. Use it when you want the typical school, not the tested-student-weighted average.</p>
+          <p><strong>Group trend chart.</strong> The chart plots the same group over time. The bold line is the weighted aggregate (students vote); the lighter line is the median school (schools vote). Solid segments are actual years, the dashed segment is the FY2026 indicator, and the sparse-dotted segment is the FY2030 illustration. Each actual year is weighted by that year's tested-student counts, so the chart can move slightly differently from any single card.</p>
+          <p><strong>FY2026 and FY2030.</strong> FY2026 carries the latest actual score forward because that won the FY2025 backtest. FY2030 is an illustration of where the group or school would land if the recent trend continued; it is not a decision-ready forecast.</p>
+          <p><strong>Top movement lists.</strong> Increases and decreases rank schools by movement from latest actual to FY2030. These are review prompts for spotting patterns worth discussing, not causal claims about what produced the trend.</p>
+          <p><strong>Tested Students.</strong> This is simply how many students that school tested in its most recent year. A value of 111 means 111 students took the assessment there that year, and in the weighted average that school's score counts with the weight of 111 students. A school that tested 222 counts about twice as much; one that tested 55 counts about half as much. The Median-School cards ignore size and give every school one equal vote.</p>
+          <p><strong>Compare schools.</strong> Add up to 10 schools for side-by-side review. Selected schools do not redefine the aggregate cards; the cards still summarize the full filtered group.</p>
+        </div>
+      </details>
+
+      <section class="summary-cards assessment-overview-kpis" aria-label="Aggregate assessment prediction summary">
+        <div class="summary-card"><span>Weighted Latest Actual</span><strong id="overview-weighted-latest">-</strong></div>
+        <div class="summary-card"><span>Weighted FY2026 Indicator</span><strong id="overview-weighted-fy2026">-</strong></div>
+        <div class="summary-card" data-fy2030-visibility><span>Weighted FY2030 Illustration</span><strong id="overview-weighted-fy2030">-</strong></div>
+        <div class="summary-card" data-fy2030-visibility><span>Weighted Movement</span><strong id="overview-weighted-movement">-</strong><small id="overview-weighted-status" class="assessment-kpi-range">-</small></div>
+        <div class="summary-card"><span>Median-School Latest</span><strong id="overview-median-latest">-</strong></div>
+        <div class="summary-card" data-fy2030-visibility><span>Median-School FY2030 Movement</span><strong id="overview-median-movement">-</strong></div>
+      </section>
+
+      <section class="filters-card assessment-overview-trend-card" aria-label="Group trend over time">
+        <div class="pair-header-row">
+          <div>
+            <h2>Group Trend Over Time</h2>
+            <p class="subtle">Weighted aggregate (students vote) and median school (schools vote) for the selected group. FY2030 is illustrative, not a decision-ready forecast.</p>
+          </div>
+        </div>
+        <div id="overview-trend-chart" class="assessment-overview-trend-chart assessment-trend-chart" aria-label="Aggregate assessment trend chart"></div>
+        <p id="overview-trend-coverage" class="subtle assessment-trend-coverage">-</p>
+      </section>
+
+      <section class="assessment-overview-coverage" aria-label="Overview coverage">
+        <span id="overview-context" class="chip info-chip">All Counties | Mathematics | All Assessments | All Students | FAY</span>
+        <span id="overview-coverage" class="chip info-chip">Schools: 0</span>
+        <span id="overview-weight-coverage" class="chip info-chip">Weights: 0</span>
+      </section>
+
+      <section class="assessment-grid assessment-grid-secondary assessment-advanced-highlights" aria-label="Expected versus actual highlights">
+        <article class="filters-card">
+          <div class="pair-header-row">
+            <div>
+              <h2>Top Context Overperformers</h2>
+              <p class="subtle">Schools scoring furthest above expected performance for schools serving similar students.</p>
+            </div>
+            <span id="overview-advanced-outperformers-count" class="chip info-chip">Rows: 0</span>
+          </div>
+          <div class="table-wrap outlier-table-wrap">
+            <table class="definitions-table pair-list-table assessment-table assessment-advanced-table">
+              <thead>
+                <tr>
+                  <th>School</th>
+                  <th>County</th>
+                  <th>Subject</th>
+                  <th>Actual</th>
+                  <th>Expected</th>
+                  <th>Difference</th>
+                  <th>Percentile</th>
+                  <th>Class</th>
+                  <th>Tested Students</th>
+                </tr>
+              </thead>
+              <tbody id="overview-advanced-outperformers-body"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="filters-card">
+          <div class="pair-header-row">
+            <div>
+              <h2>Top Context Underperformers</h2>
+              <p class="subtle">Schools scoring furthest below expected performance for schools serving similar students.</p>
+            </div>
+            <span id="overview-advanced-underperformers-count" class="chip info-chip">Rows: 0</span>
+          </div>
+          <div class="table-wrap outlier-table-wrap">
+            <table class="definitions-table pair-list-table assessment-table assessment-advanced-table">
+              <thead>
+                <tr>
+                  <th>School</th>
+                  <th>County</th>
+                  <th>Subject</th>
+                  <th>Actual</th>
+                  <th>Expected</th>
+                  <th>Difference</th>
+                  <th>Percentile</th>
+                  <th>Class</th>
+                  <th>Tested Students</th>
+                </tr>
+              </thead>
+              <tbody id="overview-advanced-underperformers-body"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="assessment-grid assessment-grid-secondary assessment-overview-watchlists" aria-label="Top assessment movement lists" data-fy2030-visibility>
+        <article class="filters-card">
+          <div class="pair-header-row">
+            <div>
+              <h2>Top 10 Illustrative Increases</h2>
+              <p class="subtle">Largest movement from latest actual to FY2030 if the recent trend continued.</p>
+            </div>
+            <span id="overview-top-increases-count" class="chip info-chip">Rows: 0</span>
+          </div>
+          <div class="table-wrap outlier-table-wrap">
+            <table class="definitions-table pair-list-table assessment-table assessment-watchlist-table">
+              <thead>
+                <tr>
+                  <th>School</th>
+                  <th>County</th>
+                  <th>Latest Actual</th>
+                  <th>FY2026</th>
+                  <th data-fy2030-visibility>FY2030</th>
+                  <th data-fy2030-visibility>Movement</th>
+                  <th>Tested Students</th>
+                </tr>
+              </thead>
+              <tbody id="overview-top-increases-body"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="filters-card">
+          <div class="pair-header-row">
+            <div>
+              <h2>Top 10 Illustrative Decreases</h2>
+              <p class="subtle">Largest decline from latest actual to FY2030 if the recent trend continued.</p>
+            </div>
+            <span id="overview-top-decreases-count" class="chip info-chip">Rows: 0</span>
+          </div>
+          <div class="table-wrap outlier-table-wrap">
+            <table class="definitions-table pair-list-table assessment-table assessment-watchlist-table">
+              <thead>
+                <tr>
+                  <th>School</th>
+                  <th>County</th>
+                  <th>Latest Actual</th>
+                  <th>FY2026</th>
+                  <th data-fy2030-visibility>FY2030</th>
+                  <th data-fy2030-visibility>Movement</th>
+                  <th>Tested Students</th>
+                </tr>
+              </thead>
+              <tbody id="overview-top-decreases-body"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section class="filters-card assessment-comparison-card" aria-label="Selected school comparison table">
+        <div class="pair-header-row">
+          <div>
+            <h2>Selected School Comparison</h2>
+            <p class="subtle">Selected schools use the current county and assessment grain filters. The aggregate above does not change when schools are selected.</p>
+          </div>
+          <span id="overview-selected-count" class="chip info-chip">Rows: 0</span>
+        </div>
+        <div class="table-wrap outlier-table-wrap">
+          <table class="definitions-table pair-list-table assessment-table assessment-watchlist-table">
+            <thead>
+              <tr>
+                <th>School</th>
+                <th>County</th>
+                <th>Latest Actual</th>
+                <th>FY2026</th>
+                <th data-fy2030-visibility>FY2030</th>
+                <th data-fy2030-visibility>Movement</th>
+                <th>Confidence</th>
+              </tr>
+            </thead>
+            <tbody id="overview-selected-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="./nav-guard.js?v=20260617a"></script>
+  <script src="./common-api.js?v=20260304a"></script>
+  <script src="./assessment-overview.js?v=20260617h"></script>
+</body>
+</html>

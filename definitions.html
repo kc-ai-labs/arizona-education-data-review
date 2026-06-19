@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ASU K8 Outliers - Field Definitions</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="top-nav">
+    <nav class="tabs" aria-label="Primary navigation">
+      <a href="./index.html">Executive Summary</a>
+      <a href="./scatter.html">Scatter Plot</a>
+      <a href="./correlation-outliers.html">Correlation Outliers</a>
+      <a href="./data-cleaning.html">Data Cleaning</a>
+      <a href="./validation.html">Validation</a>
+      <a href="./assessment-predictions.html">Assessment Predictions</a>
+      <a href="./assessment-overview.html">Assessment Overview</a>
+      <a href="./summary-stats.html">Summary Stats</a>
+      <a href="./methodology.html">Methodology</a>
+      <a href="./definitions.html" class="active" aria-current="page">Field Definitions</a>
+      <a href="./raw-data.html">Field Mapping</a>
+    </nav>
+  </header>
+
+  <main class="definitions-layout">
+    <section class="chart-section definitions-panel">
+      <div class="definitions-header">
+        <div>
+          <h1>Field Definitions</h1>
+          <p class="subtle">Field labels/descriptions plus cleaning semantics sourced from <code>analytics.vw_dim_fields_enriched</code>.</p>
+        </div>
+        <img src="./assets/asu-helios-logo-primary.webp" alt="ASU Helios Logo" class="logo definitions-logo" />
+      </div>
+
+      <div id="api-error" class="error-banner" hidden></div>
+
+      <section class="definitions-controls" aria-label="Definition filters">
+        <div>
+          <label for="definition-search">Search</label>
+          <input id="definition-search" type="search" placeholder="Search label, field name, description..." />
+        </div>
+        <div>
+          <label for="category-filter">Category</label>
+          <select id="category-filter">
+            <option value="all">All</option>
+          </select>
+        </div>
+        <div class="badge-row">
+          <div id="definition-count" class="badge">Showing 0 of 0</div>
+        </div>
+      </section>
+
+      <div class="table-wrap">
+        <table class="definitions-table">
+          <thead>
+            <tr>
+              <th>Label</th>
+              <th>School Field</th>
+              <th>Query Field</th>
+              <th>Category</th>
+              <th>Description</th>
+              <th>Type</th>
+              <th>Cleaning</th>
+              <th>Rule Details</th>
+            </tr>
+          </thead>
+          <tbody id="definitions-body"></tbody>
+        </table>
+      </div>
+
+      <div id="definitions-empty" class="empty-state" hidden>No definitions match current filters.</div>
+    </section>
+  </main>
+
+  <script src="./nav-guard.js?v=20260617a"></script>
+  <script src="./common-api.js?v=20260223c"></script>
+  <script src="./definitions.js?v=20260223c"></script>
+</body>
+</html>

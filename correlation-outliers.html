@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ASU K8 Outliers - Correlation Outliers</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="top-nav">
+    <nav class="tabs" aria-label="Primary navigation">
+      <a href="./index.html">Executive Summary</a>
+      <a href="./scatter.html">Scatter Plot</a>
+      <a href="./correlation-outliers.html" class="active" aria-current="page">Correlation Outliers</a>
+      <a href="./data-cleaning.html">Data Cleaning</a>
+      <a href="./validation.html">Validation</a>
+      <a href="./assessment-predictions.html">Assessment Predictions</a>
+      <a href="./assessment-overview.html">Assessment Overview</a>
+      <a href="./summary-stats.html">Summary Stats</a>
+      <a href="./methodology.html">Methodology</a>
+      <a href="./definitions.html">Field Definitions</a>
+      <a href="./raw-data.html">Field Mapping</a>
+    </nav>
+  </header>
+
+  <main class="definitions-layout raw-data-layout correlation-layout">
+    <section class="chart-section definitions-panel raw-data-panel correlation-page">
+      <div class="definitions-header raw-data-header">
+        <div>
+          <h1>Correlation Outlier Explorer</h1>
+          <p class="subtle">Inspect predictor→outcome relationships, trend outliers, and overlap with Isolation Forest anomalies.</p>
+        </div>
+        <img src="./assets/asu-helios-logo-primary.webp" alt="ASU Helios Logo" class="logo definitions-logo" />
+      </div>
+
+      <div id="api-error" class="error-banner" hidden></div>
+
+      <section class="definitions-controls correlation-controls" aria-label="Correlation outlier filters">
+        <div>
+          <label for="co-county">County</label>
+          <select id="co-county"></select>
+        </div>
+        <div>
+          <label for="pair-search">Pair Search</label>
+          <input id="pair-search" type="search" placeholder="Search predictor or outcome..." />
+        </div>
+        <div>
+          <label for="co-scope">Pair Scope</label>
+          <select id="co-scope">
+            <option value="default" selected>High-signal only</option>
+            <option value="all">Include exploratory</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="summary-cards correlation-kpis" aria-label="Correlation outlier summary">
+        <div class="summary-card"><span id="kpi-modeled-pairs-label">Modeled Pairs (High-signal)</span><strong id="kpi-modeled-pairs">0</strong></div>
+        <div class="summary-card"><span>Outlier Schools</span><strong id="kpi-outlier-schools">0</strong></div>
+        <div class="summary-card"><span>IF Anomaly Schools</span><strong id="kpi-if-schools">0</strong></div>
+        <div class="summary-card"><span>Overlap</span><strong id="kpi-overlap">0</strong></div>
+      </section>
+
+      <section class="pair-explorer-grid" aria-label="Pair explorer main layout">
+        <section class="filters-card correlation-chart-card">
+          <div class="pair-header-row">
+            <div>
+              <h2 id="pair-title">Select a pair</h2>
+              <p id="pair-subtitle" class="subtle">Loading pair rankings...</p>
+            </div>
+          <div id="pair-warning-chips" class="chip-row"></div>
+          </div>
+
+          <details class="interpret-panel" id="co-interpret-panel">
+            <summary>How to Interpret</summary>
+            <div id="co-interpret-content" class="interpret-content">
+              <p class="subtle">Select a pair to see a plain-English explanation of the chart, metrics, table, and statistical methods.</p>
+            </div>
+          </details>
+
+          <div id="pair-metrics" class="pair-metrics-grid" aria-label="Selected pair metrics"></div>
+
+          <div class="chart-canvas-wrap correlation-chart-wrap">
+            <canvas id="correlation-outlier-chart"></canvas>
+          </div>
+
+          <div class="footer-text">
+            <p>Gray points follow the trend. Colored points are correlation outliers. Gold rings indicate Isolation Forest overlap.</p>
+            <p id="pair-correlation-note" class="subtle">Correlation summary appears after a pair is selected.</p>
+            <p id="pair-cleaning-note" class="subtle">Pair-level data cleaning exclusions appear after a pair is selected.</p>
+          </div>
+        </section>
+
+        <section class="filters-card pair-list-card">
+          <h2>Strong Correlation Outlier Pairs</h2>
+          <div class="table-wrap pair-list-wrap">
+            <table class="definitions-table pair-list-table">
+              <thead>
+                <tr>
+                  <th>Pair</th>
+                  <th>Outliers</th>
+                  <th>+/−</th>
+                  <th>R²</th>
+                  <th>ρ</th>
+                  <th>FDR p</th>
+                  <th>Evidence</th>
+                  <th>Rank</th>
+                  <th>IF</th>
+                  <th>Warn</th>
+                </tr>
+              </thead>
+              <tbody id="pair-list-body"></tbody>
+            </table>
+          </div>
+          <div id="pair-list-empty" class="empty-state" hidden>No correlation pairs match the current filters.</div>
+        </section>
+      </section>
+
+      <section class="pair-explorer-grid secondary-grid" aria-label="Outlier schools and school detail">
+        <section class="filters-card">
+          <h2>Selected Pair Outlier Schools</h2>
+          <div class="table-wrap outlier-table-wrap">
+            <table class="definitions-table pair-list-table">
+              <thead>
+                <tr>
+                  <th>School</th>
+                  <th>County</th>
+                  <th>Dir</th>
+                  <th>Std Resid</th>
+                  <th>Cook's D</th>
+                  <th>IF</th>
+                </tr>
+              </thead>
+              <tbody id="pair-outliers-body"></tbody>
+            </table>
+          </div>
+          <div id="pair-outliers-empty" class="empty-state" hidden>No outlier schools for the selected pair and county.</div>
+        </section>
+
+        <section class="filters-card">
+          <h2>School Detail</h2>
+          <div id="school-detail" class="school-detail-card">
+            <p class="subtle">Select an outlier school from the table or chart.</p>
+          </div>
+        </section>
+      </section>
+
+      <section class="filters-card methodology-card" aria-label="Methodology and definitions">
+        <div class="method-tabs" role="tablist" aria-label="Methodology tabs">
+          <button class="tab-btn active" type="button" data-tab="how" role="tab" aria-selected="true">How We Flagged</button>
+          <button class="tab-btn" type="button" data-tab="defs" role="tab" aria-selected="false">Definitions</button>
+          <button class="tab-btn" type="button" data-tab="caveats" role="tab" aria-selected="false">Caveats</button>
+        </div>
+
+        <div id="tab-how" class="tab-panel" role="tabpanel">
+          <ul class="notes-list compact-notes">
+            <li><strong>Two-tier strong-first:</strong> we model a broad set of eligible numeric predictor→outcome pairs, then default the dashboard to only high-signal pairs.</li>
+            <li><strong>High-signal default thresholds:</strong> <code>n &gt;= 150</code>, <code>FDR-adjusted Spearman p &lt;= 0.05</code>, and <code>|rho| &gt;= 0.25</code> or <code>R² &gt;= 0.05</code>.</li>
+            <li>Default pair ranking favors sparse exceptions within strong relationships: lower <code>outlier %</code>, then stronger <code>|rho|</code>, then higher <code>R²</code>.</li>
+            <li>OLS regression is fit for each modeled pair; a school is flagged when <code>Cook's D &gt; 4/n</code> or <code>|studentized residual| &gt; 2.5</code>.</li>
+            <li>Isolation Forest is a supplementary global anomaly check across many features. Overlap indicates agreement across methods, not causal proof.</li>
+          </ul>
+        </div>
+
+        <div id="tab-defs" class="tab-panel" role="tabpanel" hidden>
+          <div id="selected-definitions" class="definitions-mini-grid"></div>
+        </div>
+
+        <div id="tab-caveats" class="tab-panel" role="tabpanel" hidden>
+          <ul class="notes-list compact-notes">
+            <li>Observational data only; do not infer causation from outliers or correlations.</li>
+            <li>Confounding variables (SES, size, geography, Title I, etc.) can drive apparent patterns.</li>
+            <li>School-level aggregate metrics do not describe individual students.</li>
+            <li>Small schools can exhibit higher percentage volatility and wider residual swings.</li>
+          </ul>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="./nav-guard.js?v=20260617a"></script>
+  <script src="./common-api.js?v=20260304e"></script>
+  <script src="./correlation-evidence.js?v=20260304e"></script>
+  <script src="./correlation-outliers.js?v=20260304e"></script>
+</body>
+</html>

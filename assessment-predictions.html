@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ASU K8 Outliers - Assessment Predictions</title>
+  <link rel="stylesheet" href="./styles.css?v=20260617h" />
+</head>
+<body>
+  <header class="top-nav">
+    <nav class="tabs" aria-label="Primary navigation">
+      <a href="./index.html">Executive Summary</a>
+      <a href="./scatter.html">Scatter Plot</a>
+      <a href="./correlation-outliers.html">Correlation Outliers</a>
+      <a href="./data-cleaning.html">Data Cleaning</a>
+      <a href="./validation.html">Validation</a>
+      <a href="./assessment-predictions.html" class="active" aria-current="page">Assessment Predictions</a>
+      <a href="./assessment-overview.html">Assessment Overview</a>
+      <a href="./summary-stats.html">Summary Stats</a>
+      <a href="./methodology.html">Methodology</a>
+      <a href="./definitions.html">Field Definitions</a>
+      <a href="./raw-data.html">Field Mapping</a>
+    </nav>
+  </header>
+
+  <main class="definitions-layout assessment-layout">
+    <section class="chart-section definitions-panel assessment-panel">
+      <div class="definitions-header assessment-header">
+        <div>
+          <h1>Assessment Predictions</h1>
+          <p class="subtle">Module 3 descriptive trend indicators for Math, ELA, and Science. Current forecasts are review prompts, not decision-ready model predictions.</p>
+        </div>
+        <img src="./assets/asu-helios-logo-primary.webp" alt="ASU Helios Logo" class="logo definitions-logo" />
+      </div>
+
+      <div id="assessment-api-error" class="error-banner" hidden></div>
+
+      <section class="definitions-controls assessment-controls" aria-label="Assessment prediction filters">
+        <div>
+          <label for="assessment-school">School</label>
+          <input id="assessment-school" type="search" list="assessment-school-list" placeholder="Search by school name or code" autocomplete="off" />
+          <datalist id="assessment-school-list"></datalist>
+        </div>
+        <div>
+          <label for="assessment-subject">Subject</label>
+          <select id="assessment-subject">
+            <option value="Mathematics">Mathematics</option>
+            <option value="English Language Arts">English Language Arts</option>
+            <option value="Science">Science</option>
+          </select>
+        </div>
+        <div>
+          <label for="assessment-test-level">Test Level</label>
+          <select id="assessment-test-level">
+            <option value="All Assessments">All Assessments</option>
+          </select>
+        </div>
+        <div>
+          <label for="assessment-subgroup">Subgroup</label>
+          <select id="assessment-subgroup">
+            <option value="All Students">All Students</option>
+          </select>
+        </div>
+        <div>
+          <label for="assessment-fay-status">FAY Status</label>
+          <select id="assessment-fay-status">
+            <option value="FAY">FAY</option>
+          </select>
+        </div>
+        <div class="badge-row">
+          <button id="assessment-load" type="button" class="tab-btn active">Load</button>
+        </div>
+      </section>
+      <p id="assessment-filter-helper" class="assessment-filter-helper subtle">Current assessment predictions are available at one grain: All Assessments, All Students, FAY.</p>
+
+      <div class="assessment-view-toggle" role="tablist" aria-label="Analysis view">
+        <button id="assessment-view-trend" type="button" class="tab-btn active" data-view="trend" role="tab" aria-selected="true">Trend</button>
+        <button id="assessment-view-advanced" type="button" class="tab-btn" data-view="advanced" role="tab" aria-selected="false">Advanced</button>
+      </div>
+      <p id="assessment-view-help" class="subtle assessment-view-help"><strong>Trend</strong> asks where this school is heading. <strong>Advanced</strong> asks how it is doing for the students it actually serves, and where its equity gaps are. Same school and subject; two different questions.</p>
+
+      <div id="assessment-trend-view">
+      <label class="assessment-horizon-toggle" for="assessment-show-fy2030">
+        <input id="assessment-show-fy2030" type="checkbox" checked />
+        <span>Show FY2030 illustration</span>
+      </label>
+      <div id="assessment-governance-banner" class="assessment-governance-banner" hidden></div>
+
+      <details id="assessment-methods" class="assessment-methods" aria-label="How to read this page">
+        <summary>How to read this page (no statistics background needed)</summary>
+        <div class="assessment-methods-body">
+          <p><strong>FY2026 Indicator.</strong> The school's most recent actual score, carried forward. Before publishing, we tested fancier options by hiding FY2025 and asking each one to predict it from earlier years. On the current data run (February 2026 extracts), carrying the latest score forward won, so that is what we show. Honest and simple beats impressive and wrong.</p>
+          <p><strong>The likely range.</strong> When we graded this method on FY2025, 8 of 10 predictions landed within the shaded band you see on the chart (as of the February 2026 run, about 7 points either way for larger schools and about 10 for small schools; each school's exact band is drawn on its chart). The range is measured from real errors, not assumed from a formula.</p>
+          <p><strong>Annual Trend.</strong> A straight line through the school's FY2022 to FY2025 scores: how many points per year the school moved. It describes the past. Our testing showed it does not improve next-year predictions, which is why it is reported separately from the indicator.</p>
+          <p><strong>FY2030 If-Trend-Continues.</strong> An illustration only: where the school would land if its recent yearly trend simply continued for five more years. No test can validate a projection that far out, so treat it as a conversation starter, not a forecast.</p>
+          <p><strong>Confidence.</strong> Higher when we have all four recent years, the scores have been steady (3 points per year of movement or less), and enough students tested for percentages to be stable. Schools with fewer than 30 tested students never exceed "medium," because one student can move their percentage by several points.</p>
+          <p><strong>Suppressed years and quality flags.</strong> The state redacts small-group results to protect privacy; those years never enter any calculation and are labeled in the table. Quality flags list data problems we found (for example, a school missing from the source extract). We show them rather than fix them silently, so a person can decide.</p>
+          <p class="assessment-methods-footnote">Full method, thresholds, and rationale: <code>phase-03-predictive/README.md</code> in the project repository. Every run's model comparison is stored in the database for audit.</p>
+        </div>
+      </details>
+
+      <details id="assessment-training" class="assessment-methods assessment-training" aria-label="How we trained this model">
+        <summary>How we trained this model</summary>
+        <div class="assessment-methods-body">
+          <p><strong>Training data.</strong> The model uses school-level Math, ELA, and Science assessment history at the same grain shown here: subject, test level, subgroup, and FAY status. Suppressed years are excluded from calculations and kept visible in the table.</p>
+          <ol class="assessment-training-list">
+            <li><strong>Set aside FY2025.</strong> The FY2025 holdout backtest fit FY2022 to FY2024, predicted FY2025, and graded each candidate against data it had not used for fitting.</li>
+            <li><strong>Compare candidates.</strong> The loader compares persistence, raw trend, and damped trend weights anchored to the latest actual score.</li>
+            <li><strong>Pick the honest winner.</strong> The selected weight comes from lowest holdout error, with ties favoring persistence. In the current run, w=0 won, so FY2026 carries forward the latest actual score.</li>
+            <li><strong>Calibrate the range.</strong> The likely range uses the 80th percentile of absolute FY2025 holdout errors, with separate widths for small and larger schools.</li>
+            <li><strong>Keep an audit trail.</strong> Each load stores source file hashes, run IDs, model metrics, quality flags, and forecast rows in MSSQL so the training path can be reviewed.</li>
+          </ol>
+          <p class="assessment-methods-footnote">Training output remains a review prompt, not a causal claim or a decision-ready prediction.</p>
+        </div>
+      </details>
+
+      <details id="assessment-band-method" class="assessment-methods assessment-band-method" aria-label="How the likely range is calculated">
+        <summary>How the likely range is calculated</summary>
+        <div class="assessment-methods-body">
+          <p><strong>It is not a standard deviation band.</strong> The shaded FY2026 range is calibrated from historical backtesting errors.</p>
+          <p><strong>Backtest setup.</strong> FY2025 was treated as unknown, the model predicted FY2025 using FY2022 through FY2024, and the miss was measured in percentage points.</p>
+          <p><strong>Band width.</strong> The displayed FY2026 range uses the 80th percentile of those absolute misses. In plain language, about 8 of 10 comparable backtested forecasts landed inside the band.</p>
+          <p><strong>Small-school adjustment.</strong> Current calibration uses separate widths based on <code>NumberTested</code>: small schools use +/- 10.0 percentage points, and larger schools use +/- 7.0 percentage points.</p>
+          <p><strong>What it does not mean.</strong> The band is a review aid, not a guarantee, not a standard statistical confidence interval, and not a causal claim. FY2030 has no band because it is an illustrative long-range continuation, not a calibrated one-year forecast.</p>
+        </div>
+      </details>
+
+      <section class="assessment-overview-cta" aria-label="Assessment overview link">
+        <div>
+          <h2>Need a county or multi-school view?</h2>
+          <p class="subtle">Use the overview page for county filters, weighted and median-school aggregates, selected-school comparison, and top movement watchlists.</p>
+        </div>
+        <a class="tab-btn active" href="./assessment-overview.html">Open Overview</a>
+      </section>
+
+      <section class="summary-cards assessment-kpis" aria-label="Trend indicator summary">
+        <div class="summary-card"><span>Latest Actual</span><strong id="assessment-latest">-</strong></div>
+        <div class="summary-card"><span>FY2026 Indicator</span><strong id="assessment-fy2026">-</strong></div>
+        <div class="summary-card" data-fy2030-visibility><span>FY2030 If-Trend-Continues (illustrative)</span><strong id="assessment-fy2030">-</strong></div>
+        <div class="summary-card"><span>Annual Trend</span><strong id="assessment-slope">-</strong></div>
+        <div class="summary-card"><span>Confidence</span><strong id="assessment-confidence">-</strong></div>
+        <div class="summary-card"><span>Trend (FY22-25)</span><strong id="assessment-trend">-</strong></div>
+      </section>
+
+      <section class="assessment-grid" aria-label="Assessment trend detail">
+        <article class="filters-card assessment-main-card">
+          <div class="pair-header-row">
+            <div>
+              <h2 id="assessment-school-title">Select a school</h2>
+              <p id="assessment-school-meta" class="subtle">Choose a school to load a subject trend indicator.</p>
+            </div>
+            <div id="assessment-chip-row" class="chip-row"></div>
+          </div>
+          <div id="assessment-empty" class="empty-state">No trend indicator loaded.</div>
+          <div id="assessment-chart" class="assessment-trend-chart" aria-label="Assessment trend chart"></div>
+        </article>
+
+        <aside class="filters-card assessment-side-card">
+          <h2>School Narrative</h2>
+          <div id="assessment-narrative" class="assessment-narrative">
+            <p class="subtle">Narrative will appear after loading a school.</p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="assessment-grid assessment-grid-secondary" aria-label="Trend facts and caveats">
+        <article class="filters-card">
+          <div class="pair-header-row">
+            <div>
+              <h2>Trend Points</h2>
+              <p class="subtle">Observed assessment history used by the trend indicator surface.</p>
+            </div>
+            <span id="assessment-point-count" class="chip info-chip">Rows: 0</span>
+          </div>
+          <div class="table-wrap outlier-table-wrap">
+            <table class="definitions-table pair-list-table assessment-table">
+              <thead>
+                <tr>
+                  <th>Fiscal Year</th>
+                  <th>Percent Passing</th>
+                  <th>Number Tested</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="assessment-points-body"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <article class="filters-card">
+          <div class="pair-header-row">
+            <div>
+              <h2>Quality Flags</h2>
+              <p class="subtle">Audit checks from source loading and school matching.</p>
+            </div>
+            <span id="assessment-flag-count" class="chip info-chip">Rows: 0</span>
+          </div>
+          <div id="assessment-flags" class="assessment-flag-list"></div>
+        </article>
+      </section>
+      </div><!-- /assessment-trend-view -->
+
+      <div id="assessment-advanced-view" hidden>
+        <details id="assessment-advanced-methods" class="assessment-methods" aria-label="How to read the advanced view">
+          <summary>How to read this (in plain English)</summary>
+          <div class="assessment-methods-body">
+            <p><strong>The idea.</strong> Schools serve very different students, so comparing them head-to-head is not fair. This view compares each school with other schools that serve <em>similar</em> students.</p>
+            <p><strong>Performance vs. expectation.</strong> We estimate the score we would expect from a school based on who it teaches: how many students come from low-income homes, are still learning English, or receive special-education services, plus the school's size and mix of students. Then we compare that to the real score. <strong>Above</strong> the expected score is a bright spot worth learning from. <strong>Below</strong> is worth a closer look. The drivers list shows what pushes the expectation up or down; because these things overlap, read it as the general picture, not an exact split.</p>
+            <p><strong>Equity gaps.</strong> The gap, in points, between groups of students at the same school (for example, students from low-income homes versus all students), and whether it has been getting smaller or larger in recent years. These are measured straight from the scores, not predicted. The gap versus a group's classmates is usually a little larger than shown, and gaps for very small groups are hidden because one or two students would swing them.</p>
+            <p><strong>Use it honestly.</strong> This is a starting point for a conversation, not a grade or a ranking. Most of the expected score comes down to economics: schools serving more students in hardship tend to score lower, so being below expected is not a school's fault. Some schools, like online schools, do not fit the usual pattern, so always pair this with what you know. The numbers show patterns, never causes.</p>
+            <p class="assessment-methods-footnote">It holds up: tested on schools it had not seen, the expected score was about a third more accurate than guessing the average. Full method: <code>phase-03-predictive/README.md</code>.</p>
+          </div>
+        </details>
+
+        <div id="assessment-advanced-snap-note" class="assessment-advanced-snap-note" hidden>
+          <span id="assessment-advanced-snap-text"></span>
+          <button id="assessment-advanced-snap-dismiss" type="button" aria-label="Dismiss advanced data note">×</button>
+        </div>
+
+        <section class="assessment-grid" aria-label="Advanced predictive analysis">
+          <article class="filters-card assessment-main-card">
+            <div class="pair-header-row">
+              <div>
+                <h2>Performance vs. Expectation</h2>
+                <p class="subtle">How this school is doing compared with schools that serve similar students.</p>
+              </div>
+              <span id="assessment-ev-chip" class="chip info-chip">-</span>
+            </div>
+            <div id="assessment-ev-empty" class="empty-state" hidden>Expected-value model not available for this school and subject.</div>
+            <div id="assessment-ev-body" class="assessment-ev-body"></div>
+            <p id="assessment-ev-metrics" class="subtle assessment-ev-metrics"></p>
+          </article>
+
+          <aside class="filters-card assessment-side-card">
+            <div class="pair-header-row">
+              <div>
+                <h2>Equity Gaps</h2>
+                <p class="subtle">Point gaps between groups of students at this school (measured, not predicted).</p>
+              </div>
+              <span id="assessment-gaps-count" class="chip info-chip">Rows: 0</span>
+            </div>
+            <div id="assessment-gaps-empty" class="empty-state" hidden>No subgroup gaps available for this school and subject.</div>
+            <div id="assessment-gaps-body" class="assessment-gaps-body"></div>
+          </aside>
+        </section>
+      </div><!-- /assessment-advanced-view -->
+
+    </section>
+  </main>
+
+  <script src="./nav-guard.js?v=20260617a"></script>
+  <script src="./common-api.js?v=20260304a"></script>
+  <script src="./assessment-predictions.js?v=20260617h"></script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ASU K8 Outliers - Scatter</title>
+  <link rel="stylesheet" href="./styles.css?v=20260305b" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="top-nav">
+    <nav class="tabs" aria-label="Primary navigation">
+      <a href="./index.html">Executive Summary</a>
+      <a href="./scatter.html" class="active" aria-current="page">Scatter Plot</a>
+      <a href="./correlation-outliers.html">Correlation Outliers</a>
+      <a href="./data-cleaning.html">Data Cleaning</a>
+      <a href="./validation.html">Validation</a>
+      <a href="./assessment-predictions.html">Assessment Predictions</a>
+      <a href="./assessment-overview.html">Assessment Overview</a>
+      <a href="./summary-stats.html">Summary Stats</a>
+      <a href="./methodology.html">Methodology</a>
+      <a href="./definitions.html">Field Definitions</a>
+      <a href="./raw-data.html">Field Mapping</a>
+    </nav>
+  </header>
+
+  <main class="layout">
+    <section class="chart-section">
+      <h1>School Comparison By Selected Metrics</h1>
+      <h2 id="chart-title">Loading...</h2>
+      <div id="api-error" class="error-banner" hidden></div>
+      <details class="interpret-panel" id="scatter-interpret-panel">
+        <summary>How to Interpret</summary>
+        <div id="scatter-interpret-content" class="interpret-content">
+          <p class="subtle">Choose X/Y axes to load a plain-English interpretation of the chart, outlier list, and statistics.</p>
+        </div>
+      </details>
+      <div class="chart-canvas-wrap">
+        <canvas id="scatter-chart"></canvas>
+      </div>
+      <div class="footer-text">
+        <p>Each point represents one K8 school in Arizona. Hover over dots for school details.</p>
+        <p id="scatter-correlation-note" class="subtle">Correlation summary appears after the chart loads.</p>
+        <p id="scatter-cleaning-note" class="subtle">Data cleaning exclusions will appear after the chart loads.</p>
+      </div>
+
+      <details class="interpret-panel scatter-pairs-panel" id="scatter-pairs-panel">
+        <summary>Correlation Strength (Ranked Relationships)</summary>
+        <div class="scatter-pairs-content">
+          <div class="scatter-pairs-toolbar">
+            <div class="scatter-pairs-filters">
+              <div class="scatter-pairs-filter">
+                <label for="scatter-pairs-filter-any">Any-side field</label>
+                <select id="scatter-pairs-filter-any">
+                  <option value="">All fields</option>
+                </select>
+              </div>
+              <div class="scatter-pairs-filter">
+                <label for="scatter-pairs-filter-predictor">Predictor field</label>
+                <select id="scatter-pairs-filter-predictor">
+                  <option value="">All predictors</option>
+                </select>
+              </div>
+              <div class="scatter-pairs-filter">
+                <label for="scatter-pairs-filter-outcome">Outcome field</label>
+                <select id="scatter-pairs-filter-outcome">
+                  <option value="">All outcomes</option>
+                </select>
+              </div>
+            </div>
+            <div class="scatter-pairs-pager">
+              <button id="scatter-pairs-prev" type="button" class="scatter-pairs-page-btn">Prev</button>
+              <span id="scatter-pairs-page-indicator" class="scatter-pairs-page-indicator">Page 1 of 1</span>
+              <button id="scatter-pairs-next" type="button" class="scatter-pairs-page-btn">Next</button>
+            </div>
+          </div>
+          <p id="scatter-pairs-summary" class="panel-note">Loading ranked relationships...</p>
+          <div id="scatter-pairs-error" class="error-banner scatter-inline-error" hidden></div>
+          <div id="scatter-pairs-table-wrap" class="table-wrap scatter-pairs-table-wrap" hidden>
+            <table class="definitions-table scatter-pairs-table">
+              <thead>
+                <tr>
+                  <th>Pair</th>
+                  <th class="scatter-pairs-sortable" data-sort-key="rank"><button type="button" class="scatter-pairs-sort-btn" data-sort-key="rank">Rank</button></th>
+                  <th class="scatter-pairs-sortable" data-sort-key="rho"><button type="button" class="scatter-pairs-sort-btn" data-sort-key="rho">ρ</button></th>
+                  <th class="scatter-pairs-sortable" data-sort-key="r2"><button type="button" class="scatter-pairs-sort-btn" data-sort-key="r2">R²</button></th>
+                  <th class="scatter-pairs-sortable" data-sort-key="fdrp"><button type="button" class="scatter-pairs-sort-btn" data-sort-key="fdrp">FDR p</button></th>
+                  <th class="scatter-pairs-sortable" data-sort-key="n"><button type="button" class="scatter-pairs-sort-btn" data-sort-key="n">n</button></th>
+                </tr>
+              </thead>
+              <tbody id="scatter-pairs-table-body"></tbody>
+            </table>
+          </div>
+          <p id="scatter-pairs-empty" class="empty-state" hidden>No ranked relationships available for the current county.</p>
+        </div>
+      </details>
+
+      <details class="interpret-panel scatter-exclusions-panel" id="scatter-exclusions-panel">
+        <summary id="excluded-schools-heading">Excluded Schools (Data Cleaning)</summary>
+        <div class="scatter-exclusions-content">
+          <p id="excluded-schools-summary" class="panel-note">Loading exclusions...</p>
+          <div id="excluded-schools-table-wrap" class="table-wrap scatter-exclusions-table-wrap" hidden>
+            <table class="definitions-table scatter-exclusions-table">
+              <thead>
+                <tr>
+                  <th>School</th>
+                  <th>Code</th>
+                  <th>County</th>
+                  <th>Reasons</th>
+                  <th>X Raw</th>
+                  <th>Y Raw</th>
+                  <th>X Clean</th>
+                  <th>Y Clean</th>
+                </tr>
+              </thead>
+              <tbody id="excluded-schools-table-body"></tbody>
+            </table>
+          </div>
+          <p id="excluded-schools-empty" class="empty-state" hidden>No excluded schools for this selection.</p>
+        </div>
+      </details>
+    </section>
+
+    <aside class="side-panel">
+      <img src="./assets/asu-helios-logo-primary.webp" alt="ASU Helios Logo" class="logo" />
+
+      <label for="x-field">X-Axis</label>
+      <select id="x-field"></select>
+
+      <label for="y-field">Y-Axis</label>
+      <select id="y-field"></select>
+
+      <label for="county">County</label>
+      <select id="county"></select>
+
+      <div id="school-count" class="badge">School Count: 0</div>
+
+      <section class="panel">
+        <h3>Category Methodology</h3>
+        <p id="category-methodology-text" class="panel-note">Loading category methodology...</p>
+        <p id="category-methodology-thresholds" class="panel-note mono" hidden></p>
+      </section>
+
+      <section class="panel">
+        <h3>Outlier Spotlight</h3>
+        <p class="panel-note">Higher absolute std_resid means more unusual vs trend.</p>
+        <ul id="outlier-list"></ul>
+      </section>
+    </aside>
+  </main>
+
+  <script src="./nav-guard.js?v=20260617a"></script>
+  <script src="./common-api.js?v=20260304e"></script>
+  <script src="./correlation-evidence.js?v=20260304e"></script>
+  <script src="./scatter-pairs.js?v=20260305b"></script>
+  <script src="./app.js?v=20260305b"></script>
+</body>
+</html>

@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ASU K8 Outliers - Validation</title>
+  <link rel="stylesheet" href="./styles.css?v=20260317b" />
+</head>
+<body>
+  <header class="top-nav">
+    <nav class="tabs" aria-label="Primary navigation">
+      <a href="./index.html">Executive Summary</a>
+      <a href="./scatter.html">Scatter Plot</a>
+      <a href="./correlation-outliers.html">Correlation Outliers</a>
+      <a href="./data-cleaning.html">Data Cleaning</a>
+      <a href="./validation.html" class="active" aria-current="page">Validation</a>
+      <a href="./assessment-predictions.html">Assessment Predictions</a>
+      <a href="./assessment-overview.html">Assessment Overview</a>
+      <a href="./summary-stats.html">Summary Stats</a>
+      <a href="./methodology.html">Methodology</a>
+      <a href="./definitions.html">Field Definitions</a>
+      <a href="./raw-data.html">Field Mapping</a>
+    </nav>
+  </header>
+
+  <main class="definitions-layout raw-data-layout">
+    <section class="chart-section definitions-panel raw-data-panel">
+      <div class="definitions-header raw-data-header">
+        <div>
+          <h1>Validation</h1>
+          <p class="subtle">Latest-run view of Phase 2 validation coverage, unresolved columns, row-level mismatches, matching evidence, and attempt lineage.</p>
+        </div>
+        <img src="./assets/asu-helios-logo-primary.webp" alt="ASU Helios Logo" class="logo definitions-logo" />
+      </div>
+
+      <div id="validation-api-error" class="error-banner" hidden></div>
+
+      <section class="definitions-controls correlation-controls" aria-label="Validation filters">
+        <div>
+          <label for="validation-field-search">Field Search</label>
+          <input id="validation-field-search" type="search" placeholder="Search field or authority..." />
+        </div>
+        <div>
+          <label for="validation-school-search">School Search</label>
+          <input id="validation-school-search" type="search" placeholder="School code or school name..." />
+        </div>
+        <div>
+          <label for="validation-coverage-status">Coverage Status</label>
+          <select id="validation-coverage-status">
+            <option value="">All</option>
+            <option value="source_confirmed">source_confirmed</option>
+            <option value="authority_identified_pending_extractor">authority_identified_pending_extractor</option>
+            <option value="exhausted_no_source">exhausted_no_source</option>
+            <option value="needs_manual_review">needs_manual_review</option>
+          </select>
+        </div>
+        <div>
+          <label for="validation-attempt-result">Attempt Result</label>
+          <select id="validation-attempt-result">
+            <option value="">All</option>
+            <option value="source_confirmed">source_confirmed</option>
+            <option value="needs_manual_review">needs_manual_review</option>
+            <option value="authority_identified_pending_extractor">authority_identified_pending_extractor</option>
+            <option value="exhausted_no_source">exhausted_no_source</option>
+            <option value="matched">matched</option>
+            <option value="mismatched">mismatched</option>
+            <option value="not_available_on_source">not_available_on_source</option>
+            <option value="extract_error">extract_error</option>
+            <option value="school_not_resolved">school_not_resolved</option>
+          </select>
+        </div>
+        <div>
+          <label for="validation-limit">Row Limit</label>
+          <input id="validation-limit" type="number" min="1" max="500" value="100" />
+        </div>
+        <div class="badge-row">
+          <button id="validation-refresh" type="button" class="tab-btn active">Refresh</button>
+        </div>
+      </section>
+
+      <section class="summary-cards correlation-kpis" aria-label="Validation run summary">
+        <div class="summary-card"><span>Registry Fields</span><strong id="validation-registry-fields">0</strong></div>
+        <div class="summary-card"><span>Source Confirmed</span><strong id="validation-source-confirmed">0</strong></div>
+        <div class="summary-card"><span>Unresolved Fields</span><strong id="validation-unresolved-fields">0</strong></div>
+        <div class="summary-card"><span>Total Attempts</span><strong id="validation-attempt-count">0</strong></div>
+        <div class="summary-card"><span>Matched Rows</span><strong id="validation-match-count">0</strong></div>
+        <div class="summary-card"><span>Mismatched Rows</span><strong id="validation-mismatch-count">0</strong></div>
+        <div class="summary-card"><span>Unavailable Rows</span><strong id="validation-unavailable-count">0</strong></div>
+        <div class="summary-card"><span>Error Rows</span><strong id="validation-error-count">0</strong></div>
+        <div class="summary-card"><span>Success Rate</span><strong id="validation-success-rate">-</strong></div>
+      </section>
+      <p id="validation-run-id" class="subtle" style="margin-top:8px;">Run ID: -</p>
+      <p id="validation-run-meta" class="subtle">Label: - | Mode: - | Sample: - | Strategy: -</p>
+      <p id="validation-run-completed" class="subtle">Completed: -</p>
+      <p id="validation-limit-note" class="subtle">Limit: 100 rows per API section</p>
+
+      <section class="validation-visual-grid" aria-label="Validation visual summary">
+        <article class="validation-visual-card" aria-label="Field coverage visual">
+          <h2>Field Coverage</h2>
+          <p class="subtle">Whether each dataset column has a reproducible source path or still needs review.</p>
+          <div id="validation-field-coverage-bar" class="validation-stacked-bar" aria-label="Field coverage buckets"></div>
+          <div id="validation-field-coverage-legend" class="validation-chart-legend"></div>
+        </article>
+
+        <article class="validation-visual-card" aria-label="Value outcomes visual">
+          <h2>Value Outcomes</h2>
+          <p class="subtle">Row-level comparison results for fields that can be checked against source data.</p>
+          <div id="validation-value-outcome-bar" class="validation-stacked-bar" aria-label="Value outcome buckets"></div>
+          <div id="validation-value-outcome-legend" class="validation-chart-legend"></div>
+        </article>
+
+        <article class="validation-visual-card" aria-label="Manual adjudication visual">
+          <h2>Manual Adjudication</h2>
+          <p id="validation-manual-status-note" class="subtle">Human decision layer for fields AI could not fully resolve.</p>
+          <div id="validation-manual-status-bar" class="validation-stacked-bar" aria-label="Manual adjudication buckets"></div>
+          <div id="validation-manual-status-legend" class="validation-chart-legend"></div>
+        </article>
+
+        <article class="validation-visual-card" aria-label="Top validation issue fields">
+          <h2>Top Issue Fields</h2>
+          <p class="subtle">Fields with the largest mismatch, unavailable, or error counts in the latest run.</p>
+          <p class="subtle">Issues = mismatched values + unavailable source values + school/entity resolution errors.</p>
+          <div id="validation-top-issues-list" class="validation-issue-list"></div>
+        </article>
+      </section>
+
+      <section id="validation-school-snapshot" class="filters-card methodology-card" aria-label="Per-school validation snapshot">
+        <div class="pair-header-row">
+          <div>
+            <h2>School Validation Snapshot</h2>
+            <p class="subtle">Pick a school in the search box above to see every field's validation status for that school in one view. Filters by school code or name.</p>
+            <p id="validation-school-snapshot-target" class="subtle"><strong>No school selected.</strong> Type a school code (e.g. <code>5958</code>) or partial name in the search box and press Refresh.</p>
+          </div>
+          <div class="chip-row" id="validation-school-snapshot-chips"></div>
+        </div>
+        <div id="validation-school-snapshot-empty" class="subtle" style="margin-top: 8px;" hidden>No fields returned for the selected school. Try a different school code or name.</div>
+        <div class="table-wrap outlier-table-wrap" id="validation-school-snapshot-wrap" hidden>
+          <table class="definitions-table pair-list-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Source Family</th>
+                <th>Status</th>
+                <th>Local Value</th>
+                <th>Source Value</th>
+                <th>Manual Verdict</th>
+                <th>Source Used</th>
+                <th data-evidence-template="true">Evidence</th>
+              </tr>
+            </thead>
+            <tbody id="validation-school-snapshot-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="filters-card methodology-card" aria-label="Validation coverage matrix">
+        <div class="pair-header-row">
+          <div>
+            <h2>Coverage Matrix</h2>
+            <p class="subtle">Column-by-column ledger of source coverage, investigation status, and latest-run row-level outcomes.</p>
+          </div>
+          <div class="chip-row">
+            <span id="validation-coverage-count" class="chip info-chip">Rows: 0</span>
+            <button id="validation-export-coverage" type="button" class="tab-btn">Export CSV</button>
+          </div>
+        </div>
+        <div class="table-wrap outlier-table-wrap">
+          <table class="definitions-table pair-list-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Source Family</th>
+                <th>Authority</th>
+                <th>Status</th>
+                <th>Attempts</th>
+                <th>Matched</th>
+                <th>Mismatched</th>
+                <th>Unavailable</th>
+                <th>Errors</th>
+                <th data-evidence-template="true">Evidence</th>
+              </tr>
+            </thead>
+            <tbody id="validation-coverage-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="filters-card methodology-card" aria-label="Unresolved validation columns">
+        <div class="pair-header-row">
+          <div>
+            <h2>Unresolved Columns</h2>
+            <p class="subtle">Fields still awaiting a confirmed validation path or blocked by extraction issues after investigation.</p>
+          </div>
+          <div class="chip-row">
+            <span id="validation-unresolved-count" class="chip info-chip">Rows: 0</span>
+            <button id="validation-export-unresolved" type="button" class="tab-btn">Export CSV</button>
+          </div>
+        </div>
+        <div class="table-wrap outlier-table-wrap">
+          <table class="definitions-table pair-list-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Status</th>
+                <th>Authority</th>
+                <th>Attempts</th>
+                <th>Errors</th>
+                <th data-evidence-template="true">Evidence</th>
+              </tr>
+            </thead>
+            <tbody id="validation-unresolved-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="filters-card methodology-card" aria-label="Manual validation review decisions">
+        <div class="pair-header-row">
+          <div>
+            <h2>Manual Review Decisions</h2>
+            <p class="subtle">Human adjudication layered over automated validation. These decisions do not overwrite source data or automated run history.</p>
+          </div>
+          <div class="chip-row">
+            <span id="validation-manual-reviews-count" class="chip info-chip">Rows: 0</span>
+            <button id="validation-export-manual-reviews" type="button" class="tab-btn">Export CSV</button>
+          </div>
+        </div>
+        <div class="table-wrap outlier-table-wrap">
+          <table class="definitions-table pair-list-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Automated Status</th>
+                <th>Manual Status</th>
+                <th>Examples</th>
+                <th>Notes</th>
+                <th>Recommended Action</th>
+                <th>Reviewed At</th>
+                <th data-evidence-template="true">Evidence</th>
+              </tr>
+            </thead>
+            <tbody id="validation-manual-reviews-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="filters-card methodology-card" aria-label="Manual validation examples">
+        <div class="pair-header-row">
+          <div>
+            <h2>Manual Review Examples</h2>
+            <p class="subtle">Concrete school-level examples captured during human review for unresolved fields.</p>
+          </div>
+          <div class="chip-row">
+            <span id="validation-manual-examples-count" class="chip info-chip">Rows: 0</span>
+            <button id="validation-export-manual-examples" type="button" class="tab-btn">Export CSV</button>
+          </div>
+        </div>
+        <div class="table-wrap outlier-table-wrap">
+          <table class="definitions-table pair-list-table">
+            <thead>
+              <tr>
+                <th>School</th>
+                <th>Field</th>
+                <th>Local Value</th>
+                <th>Source Value</th>
+                <th>Source Year</th>
+                <th>Classification</th>
+                <th>Why It Matters</th>
+                <th data-evidence-template="true">Evidence</th>
+              </tr>
+            </thead>
+            <tbody id="validation-manual-examples-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="filters-card methodology-card" aria-label="Validation mismatches">
+        <div class="pair-header-row">
+          <div>
+            <h2>Matched Columns With Mismatched Data</h2>
+            <p class="subtle">Sample-school rows where the validation source was found but the value does not agree with our dataset.</p>
+          </div>
+          <div class="chip-row">
+            <span id="validation-mismatches-count" class="chip info-chip">Rows: 0</span>
+            <button id="validation-export-mismatches" type="button" class="tab-btn">Export CSV</button>
+          </div>
+        </div>
+        <div class="table-wrap outlier-table-wrap">
+          <table class="definitions-table pair-list-table">
+            <thead>
+              <tr>
+                <th>School</th>
+                <th>Field</th>
+                <th>Local Value</th>
+                <th>Source Value</th>
+                <th>Confidence</th>
+                <th>Source Used</th>
+                <th>Compared At</th>
+                <th data-evidence-template="true">Evidence</th>
+              </tr>
+            </thead>
+            <tbody id="validation-mismatches-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="filters-card methodology-card" aria-label="Validation matches">
+        <div class="pair-header-row">
+          <div>
+            <h2>Matched Columns With Matching Data</h2>
+            <p class="subtle">Sample-school rows where the validation source aligned with the stored dataset value after normalization.</p>
+          </div>
+          <div class="chip-row">
+            <span id="validation-matches-count" class="chip info-chip">Rows: 0</span>
+            <button id="validation-export-matches" type="button" class="tab-btn">Export CSV</button>
+          </div>
+        </div>
+        <div class="table-wrap outlier-table-wrap">
+          <table class="definitions-table pair-list-table">
+            <thead>
+              <tr>
+                <th>School</th>
+                <th>Field</th>
+                <th>Local Value</th>
+                <th>Source Value</th>
+                <th>Confidence</th>
+                <th>Source Used</th>
+                <th>Compared At</th>
+                <th data-evidence-template="true">Evidence</th>
+              </tr>
+            </thead>
+            <tbody id="validation-matches-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="filters-card methodology-card" aria-label="Validation attempt log">
+        <div class="pair-header-row">
+          <div>
+            <h2>Source Attempt Log</h2>
+            <p class="subtle">Discovery and row-validation attempts with source lineage so unresolved fields remain auditable.</p>
+          </div>
+          <div class="chip-row">
+            <span id="validation-attempts-count" class="chip info-chip">Rows: 0</span>
+            <button id="validation-export-attempts" type="button" class="tab-btn">Export CSV</button>
+          </div>
+        </div>
+        <div class="table-wrap outlier-table-wrap">
+          <table class="definitions-table pair-list-table">
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>School</th>
+                <th>Stage</th>
+                <th>Result</th>
+                <th>Source Type</th>
+                <th>Locator</th>
+                <th>Query</th>
+                <th>Failure</th>
+                <th data-evidence-template="true">Evidence</th>
+              </tr>
+            </thead>
+            <tbody id="validation-attempts-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="filters-card methodology-card" aria-label="Validation methodology notes">
+        <h2>Methodology & Caveats</h2>
+        <ul class="notes-list compact-notes">
+          <li>The page shows the latest validation run only; historical runs remain stored in `analytics.validation_runs` and related tables.</li>
+          <li>Coverage status reflects column-level source discovery. Row-level matches and mismatches only exist for `source_confirmed` fields in the selected validation sample.</li>
+          <li>Manual review status is an adjudication layer. It does not update `analytics.schools` or rewrite automated validation result tables.</li>
+          <li>Evidence links point to the source family reference or drilldown hint captured during validation. CSV exports preserve the exact latest-run rows shown above.</li>
+          <li>Low initial match rates are acceptable during the POC as long as attempts and failure reasons are preserved for review.</li>
+        </ul>
+      </section>
+    </section>
+  </main>
+
+  <script src="./nav-guard.js?v=20260617a"></script>
+  <script src="./common-api.js?v=20260304a"></script>
+  <script src="./validation.js?v=20260317b"></script>
+</body>
+</html>

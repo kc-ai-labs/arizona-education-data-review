@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ASU K8 Outliers - Field Mapping</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <header class="top-nav">
+    <nav class="tabs" aria-label="Primary navigation">
+      <a href="./index.html">Executive Summary</a>
+      <a href="./scatter.html">Scatter Plot</a>
+      <a href="./correlation-outliers.html">Correlation Outliers</a>
+      <a href="./data-cleaning.html">Data Cleaning</a>
+      <a href="./validation.html">Validation</a>
+      <a href="./assessment-predictions.html">Assessment Predictions</a>
+      <a href="./assessment-overview.html">Assessment Overview</a>
+      <a href="./summary-stats.html">Summary Stats</a>
+      <a href="./methodology.html">Methodology</a>
+      <a href="./definitions.html">Field Definitions</a>
+      <a href="./raw-data.html" class="active" aria-current="page">Field Mapping</a>
+    </nav>
+  </header>
+
+  <main class="definitions-layout raw-data-layout">
+    <section class="chart-section definitions-panel raw-data-panel">
+      <div class="definitions-header raw-data-header">
+        <div>
+          <h1>School / Range Field Mapping</h1>
+          <p class="subtle">Explains how <code>analytics.school_range</code> fields map to <code>analytics.schools</code>, including per-field definitions and derivation relationships used for the master analysis view.</p>
+        </div>
+        <img src="./assets/asu-helios-logo-primary.webp" alt="ASU Helios Logo" class="logo definitions-logo" />
+      </div>
+
+      <div id="api-error" class="error-banner" hidden></div>
+
+      <section class="summary-cards" aria-label="Field mapping summary">
+        <div class="summary-card"><span>Schools Columns</span><strong id="summary-school-columns">0</strong></div>
+        <div class="summary-card"><span>Range Columns</span><strong id="summary-range-columns">0</strong></div>
+        <div class="summary-card"><span>Exact Overlap</span><strong id="summary-exact">0</strong></div>
+        <div class="summary-card"><span>Derived Mappings</span><strong id="summary-derived">0</strong></div>
+        <div class="summary-card"><span>Unique Range Fields</span><strong id="summary-unique">0</strong></div>
+        <div class="summary-card"><span>Valid Declared Mappings</span><strong id="summary-valid-mappings">0</strong></div>
+      </section>
+
+      <section class="filters-grid raw-data-meta-grid" aria-label="Master dataset and verification info">
+        <section class="filters-card">
+          <h2>Master Dataset</h2>
+          <dl class="summary-list compact-summary">
+            <div><dt>View</dt><dd id="master-view-name" class="mono">-</dd></div>
+            <div><dt>Rollout</dt><dd id="master-rollout">-</dd></div>
+            <div><dt>Join Key</dt><dd id="master-join-key" class="mono">-</dd></div>
+            <div><dt>Included Range Fields</dt><dd id="master-included-count">0</dd></div>
+          </dl>
+          <p class="subtle raw-data-note">Metadata-first rollout: scatter axes are unchanged in this release.</p>
+        </section>
+
+        <section class="filters-card">
+          <h2>Verification</h2>
+          <dl class="summary-list compact-summary">
+            <div><dt>Schema Inspection</dt><dd id="verify-success">-</dd></div>
+            <div><dt>Source</dt><dd id="verify-source" class="mono">-</dd></div>
+          </dl>
+          <ul id="verification-messages" class="notes-list"></ul>
+        </section>
+      </section>
+
+      <section class="definitions-controls raw-data-controls" aria-label="Field mapping inventory filters">
+        <div>
+          <label for="raw-data-search">Search</label>
+          <input id="raw-data-search" type="search" placeholder="Search fields, labels, definitions, derivation, reasons, notes..." />
+        </div>
+        <div>
+          <label for="mapping-type-filter">Mapping Type</label>
+          <select id="mapping-type-filter">
+            <option value="all">All</option>
+          </select>
+        </div>
+        <div>
+          <label for="raw-data-category-filter">Category</label>
+          <select id="raw-data-category-filter">
+            <option value="all">All</option>
+          </select>
+        </div>
+        <div>
+          <label for="action-filter">Master Action</label>
+          <select id="action-filter">
+            <option value="all">All</option>
+            <option value="include">Include</option>
+            <option value="exclude_from_school_range">Exclude from school_range</option>
+          </select>
+        </div>
+        <div class="badge-row">
+          <div id="inventory-count" class="badge">Showing 0 of 0</div>
+        </div>
+      </section>
+
+      <h2 class="section-heading">Full Field Inventory</h2>
+      <div class="table-wrap">
+        <table class="definitions-table raw-data-table">
+          <thead>
+            <tr>
+              <th>Range Field</th>
+              <th>School Field</th>
+              <th>Mapping Type</th>
+              <th>Master Action</th>
+              <th>Label</th>
+              <th>Category</th>
+              <th>Field Definition</th>
+              <th>How It Relates To schools</th>
+              <th>Reason</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody id="inventory-body"></tbody>
+        </table>
+      </div>
+      <div id="inventory-empty" class="empty-state" hidden>No field mapping rows match current filters.</div>
+
+      <section class="filters-grid raw-data-panels" aria-label="Included and excluded school_range fields">
+        <section class="filters-card raw-data-mini-card">
+          <h2>Included In Master Dataset</h2>
+          <div class="table-wrap mini-table-wrap">
+            <table class="definitions-table raw-data-table mini-table">
+              <thead>
+                <tr>
+                  <th>Range Field</th>
+                  <th>Category</th>
+                  <th>Reason</th>
+                </tr>
+              </thead>
+              <tbody id="included-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="filters-card raw-data-mini-card">
+          <h2>Excluded From school_range In Master Dataset</h2>
+          <div class="table-wrap mini-table-wrap">
+            <table class="definitions-table raw-data-table mini-table">
+              <thead>
+                <tr>
+                  <th>Range Field</th>
+                  <th>Mapping Type</th>
+                  <th>Reason</th>
+                </tr>
+              </thead>
+              <tbody id="excluded-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </section>
+  </main>
+
+  <script src="./nav-guard.js?v=20260617a"></script>
+  <script src="./common-api.js?v=20260223c"></script>
+  <script src="./raw-data.js?v=20260223c"></script>
+</body>
+</html>

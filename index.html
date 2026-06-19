@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ASU K8 Outliers - Executive Summary</title>
+  <link rel="stylesheet" href="./styles.css?v=20260617h" />
+</head>
+<body>
+  <header class="top-nav">
+    <nav class="tabs" aria-label="Primary navigation">
+      <a href="./index.html" class="active" aria-current="page">Executive Summary</a>
+      <a href="./scatter.html">Scatter Plot</a>
+      <a href="./correlation-outliers.html">Correlation Outliers</a>
+      <a href="./data-cleaning.html">Data Cleaning</a>
+      <a href="./validation.html">Validation</a>
+      <a href="./assessment-predictions.html">Assessment Predictions</a>
+      <a href="./assessment-overview.html">Assessment Overview</a>
+      <a href="./summary-stats.html">Summary Stats</a>
+      <a href="./methodology.html">Methodology</a>
+      <a href="./definitions.html">Field Definitions</a>
+      <a href="./raw-data.html">Field Mapping</a>
+    </nav>
+  </header>
+
+  <main class="definitions-layout executive-layout">
+    <section class="chart-section definitions-panel executive-panel">
+      <div class="definitions-header executive-header">
+        <div>
+          <h1>Executive Summary</h1>
+          <p class="subtle">Top outlier schools and relationship signals from Phase 1 correlation analysis.</p>
+        </div>
+        <img src="./assets/asu-helios-logo-primary.webp" alt="ASU Helios Logo" class="logo definitions-logo" />
+      </div>
+
+      <div id="api-error" class="error-banner" hidden></div>
+
+      <section class="definitions-controls executive-controls" aria-label="Executive summary filters">
+        <div>
+          <label for="exec-county">County</label>
+          <select id="exec-county"><option value="all">All</option></select>
+        </div>
+        <div>
+          <label for="exec-scope">Pair Scope</label>
+          <select id="exec-scope">
+            <option value="default">High-signal only</option>
+            <option value="all">Include exploratory</option>
+          </select>
+        </div>
+        <div class="badge-row">
+          <div id="exec-run-id" class="badge">Run ID: -</div>
+          <div id="exec-as-of" class="badge">As of: -</div>
+        </div>
+      </section>
+
+      <section class="summary-cards executive-kpi-grid" aria-label="Executive KPIs">
+        <div class="summary-card"><span>Modeled Pairs</span><strong id="kpi-modeled-pairs">0</strong></div>
+        <div class="summary-card"><span>Outlier Schools</span><strong id="kpi-outlier-schools">0</strong></div>
+        <div class="summary-card"><span>IF Anomaly Schools</span><strong id="kpi-if-schools">0</strong></div>
+        <div class="summary-card"><span>Overlap Schools</span><strong id="kpi-overlap-schools">0</strong></div>
+        <div class="summary-card"><span>Schools In Scope</span><strong id="kpi-schools-in-scope">0</strong></div>
+      </section>
+
+      <section class="summary-detail-card executive-interpret-card" aria-labelledby="exec-interpret-title">
+        <details class="executive-interpret-details" open>
+          <summary><span id="exec-interpret-title">How to Interpret These Metrics</span></summary>
+          <p class="subtle">Use these definitions and formulas to explain what each relationship row means in plain language.</p>
+          <div id="exec-metric-glossary" class="executive-interpret-grid"></div>
+          <div id="exec-quality-defs" class="executive-quality-defs"></div>
+          <div id="exec-worked-example" class="executive-worked-example"></div>
+        </details>
+      </section>
+
+      <section class="summary-detail-card executive-top-schools-card" aria-labelledby="exec-top-schools-title">
+        <div class="executive-card-heading">
+          <div>
+            <h2 id="exec-top-schools-title">Top 10 Unique Outlier Schools</h2>
+            <p class="subtle">Schools are ranked with deterministic tie-breakers across high-signal outlier relationships, severity, and pair quality.</p>
+          </div>
+        </div>
+        <div id="exec-top-schools" class="executive-school-list"></div>
+        <div id="exec-top-schools-empty" class="empty-state" hidden>No outlier schools found for this filter scope.</div>
+      </section>
+
+      <section class="summary-detail-card executive-method-card" aria-labelledby="exec-method-title">
+        <h2 id="exec-method-title">How This Was Built</h2>
+        <details open>
+          <summary>Executive Overview</summary>
+          <div id="exec-method-overview" class="interpret-content"></div>
+        </details>
+        <details>
+          <summary>Technical Methodology</summary>
+          <div id="exec-method-technical" class="interpret-content"></div>
+        </details>
+        <details>
+          <summary>Codex and Context Engineering Trace</summary>
+          <div id="exec-method-provenance" class="interpret-content"></div>
+        </details>
+      </section>
+    </section>
+  </main>
+
+  <script src="./nav-guard.js?v=20260617a"></script>
+  <script src="./common-api.js?v=20260304a"></script>
+  <script src="./correlation-evidence.js?v=20260304a"></script>
+  <script src="./executive-summary-data.js?v=20260304a"></script>
+  <script src="./executive-summary.js?v=20260304a"></script>
+</body>
+</html>
